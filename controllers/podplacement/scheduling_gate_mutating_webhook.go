@@ -26,6 +26,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/json"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+
+	"github.com/openshift/multiarch-manager-operator/pkg/utils"
 )
 
 const (
@@ -64,8 +66,9 @@ func (a *PodSchedulingGateMutatingWebHook) Handle(ctx context.Context, req admis
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
-	// ignore the openshift-* namespace as those are infra components
-	if strings.HasPrefix(pod.Namespace, "openshift-") || strings.HasPrefix(pod.Namespace, "hypershift-") || strings.HasPrefix(pod.Namespace, "kube-") {
+	// ignore the openshift-* namespace as those are infra components, and ignore the namespace where the operand is running too
+	if utils.Namespace() == pod.Namespace || strings.HasPrefix(pod.Namespace, "openshift-") ||
+		strings.HasPrefix(pod.Namespace, "hypershift-") || strings.HasPrefix(pod.Namespace, "kube-") {
 		return a.patchedPodResponse(pod, req)
 	}
 
