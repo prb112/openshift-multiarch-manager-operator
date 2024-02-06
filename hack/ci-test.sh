@@ -23,8 +23,11 @@ REPO_ROOT=$(dirname "${BASH_SOURCE}")/..
 OPENSHIFT_CI=${OPENSHIFT_CI:-""}
 ARTIFACT_DIR=${ARTIFACT_DIR:-""}
 GINKGO=${GINKGO:-"go run ${REPO_ROOT}/vendor/github.com/onsi/ginkgo/v2/ginkgo"}
-GINKGO_ARGS=${GINKGO_ARGS:-"-vv --randomize-all --randomize-suites -race -trace --keep-going --timeout=10m --label-filter integration"}
+GINKGO_ARGS=${GINKGO_ARGS:-"-vv --randomize-all --randomize-suites -race -trace --keep-going --timeout=10m "}
+TEST_LABEL=${TEST_LABEL:-"integration"}
+GINKGO_ARGS="${GINKGO_ARGS} --label-filter ${TEST_LABEL}"
 GINKGO_EXTRA_ARGS=${GINKGO_EXTRA_ARGS:-""}
+SKIP_COVERAGE=${SKIP_COVERAGE:-"false"}
 
 # Ensure that some home var is set and that it's not the root.
 # This is required for the kubebuilder cache.
@@ -34,7 +37,11 @@ if [ $HOME == "/" ]; then
 fi
 
 if [ "$OPENSHIFT_CI" == "true" ] && [ -n "$ARTIFACT_DIR" ] && [ -d "$ARTIFACT_DIR" ]; then # detect ci environment there
-  GINKGO_ARGS="${GINKGO_ARGS} --junit-report=junit_multiarch_manager_operator.xml --cover --coverprofile=test-unit-coverage.out --output-dir=${ARTIFACT_DIR}"
+  GINKGO_ARGS="${GINKGO_ARGS} --junit-report=junit_multiarch_manager_operator.xml --output-dir=${ARTIFACT_DIR}"
+fi
+
+if [ "$SKIP_COVERAGE" != "true" ] && [ -n "$ARTIFACT_DIR" ] && [ -d "$ARTIFACT_DIR" ]; then
+  GINKGO_ARGS="${GINKGO_ARGS} --cover --coverprofile=test-unit-coverage.out"
 fi
 
 # Print the command we are going to run as Make would.

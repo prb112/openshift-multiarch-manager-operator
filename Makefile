@@ -344,6 +344,13 @@ unit: manifests generate envtest
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" \
 		./hack/ci-test.sh
 
+e2e: manifests generate envtest
+	mkdir -p ${ARTIFACT_DIR}
+	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" \
+	SKIP_COVERAGE="true" \
+	TEST_LABEL="e2e" \
+		./hack/ci-test.sh
+
 .PHONY: clean
 clean:
 	rm -rf ${ARTIFACT_DIR}
