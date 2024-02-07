@@ -1,0 +1,351 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "multiarch.openshift.io/v1alpha1",
+          "kind": "PodPlacementConfig",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "multiarch-operator",
+              "app.kubernetes.io/instance": "podplacementconfig-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "podplacementconfig",
+              "app.kubernetes.io/part-of": "multiarch-operator"
+            },
+            "name": "podplacementconfig-sample"
+          },
+          "spec": {
+            "logVerbosity": "Normal",
+            "namespaceSelector": {
+              "matchExpressions": [
+                {
+                  "key": "multiarch.openshift.io/excludeNamespace",
+                  "operator": "DoesNotExist"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    capabilities: Basic Install
+    createdAt: "2024-02-07T21:39:42Z"
+    operators.operatorframework.io/builder: operator-sdk-v1.33.0
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+  name: multiarch-operator.v0.0.1
+  namespace: openshift-multiarch-operator
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: PodPlacementConfig is the Schema for the podplacementconfigs API
+      displayName: Pod Placement Config
+      kind: PodPlacementConfig
+      name: podplacementconfigs.multiarch.openshift.io
+      version: v1alpha1
+  description: The Multiarch Manager Operator (MMO) operator aims to address problems
+    and usability issues encountered when working with Openshift clusters with multi-architecture
+    compute nodes.
+  displayName: multiarch-manager-operator
+  icon:
+  - base64data: ""
+    mediatype: ""
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - admissionregistration.k8s.io
+          resources:
+          - mutatingwebhookconfigurations
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - admissionregistration.k8s.io
+          resources:
+          - mutatingwebhookconfigurations/status
+          verbs:
+          - get
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments/status
+          verbs:
+          - get
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+        - apiGroups:
+          - ""
+          resources:
+          - services
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - services/status
+          verbs:
+          - get
+        - apiGroups:
+          - multiarch.openshift.io
+          resources:
+          - podplacementconfigs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - multiarch.openshift.io
+          resources:
+          - podplacementconfigs/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - multiarch.openshift.io
+          resources:
+          - podplacementconfigs/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: multiarch-operator-controller-manager
+      deployments:
+      - label:
+          app.kubernetes.io/component: manager
+          app.kubernetes.io/created-by: multiarch-operator
+          app.kubernetes.io/instance: controller-manager
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: deployment
+          app.kubernetes.io/part-of: multiarch-operator
+          control-plane: controller-manager
+        name: multiarch-operator-controller-manager
+        spec:
+          replicas: 2
+          selector:
+            matchLabels:
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+                multiarch.openshift.io/image: controller:latest
+              labels:
+                control-plane: controller-manager
+            spec:
+              affinity:
+                nodeAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                    - matchExpressions:
+                      - key: kubernetes.io/arch
+                        operator: In
+                        values:
+                        - amd64
+                        - arm64
+                        - ppc64le
+                        - s390x
+                      - key: kubernetes.io/os
+                        operator: In
+                        values:
+                        - linux
+              containers:
+              - args:
+                - --health-probe-bind-address=:8081
+                - --metrics-bind-address=127.0.0.1:8080
+                - --leader-elect
+                - -zap-log-level=3
+                - --enable-operator
+                command:
+                - /manager
+                env:
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: IMAGE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.annotations['multiarch.openshift.io/image']
+                image: controller:latest
+                imagePullPolicy: Always
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 128Mi
+                  requests:
+                    cpu: 10m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                volumeMounts:
+                - mountPath: /var/run/manager/tls
+                  name: webhook-server-cert
+                  readOnly: true
+                - mountPath: /etc/ssl/certs/
+                  name: ca-projected-volume
+                  readOnly: true
+              - args:
+                - --secure-listen-address=0.0.0.0:8443
+                - --upstream=http://127.0.0.1:8080/
+                - --logtostderr=true
+                - --v=0
+                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.13.1
+                name: kube-rbac-proxy
+                ports:
+                - containerPort: 8443
+                  name: https
+                  protocol: TCP
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 128Mi
+                  requests:
+                    cpu: 5m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: multiarch-operator-controller-manager
+              terminationGracePeriodSeconds: 10
+              volumes:
+              - name: webhook-server-cert
+                secret:
+                  defaultMode: 420
+                  secretName: webhook-server-cert
+              - name: ca-projected-volume
+                projected:
+                  sources:
+                  - configMap:
+                      items:
+                      - key: service-ca.crt
+                        path: openshift-ca.crt
+                      name: openshift-service-ca.crt
+                      optional: true
+                  - configMap:
+                      items:
+                      - key: ca.crt
+                        path: kube-root-ca.crt
+                      name: kube-root-ca.crt
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: multiarch-operator-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - multiarch-manager-operator
+  - mmo
+  - pod-placement
+  links:
+  - name: Multiarch Operator
+    url: https://github.com/openshift/multiarch-manager-operator
+  maturity: alpha
+  minKubeVersion: 1.27.0
+  provider:
+    name: Red Hat
+  version: 0.0.1

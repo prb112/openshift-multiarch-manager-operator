@@ -1,0 +1,49 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: '[]'
+    capabilities: Basic Install
+  name: multiarch-operator.v0.0.1
+  namespace: openshift-multiarch-operator
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: PodPlacementConfig is the Schema for the podplacementconfigs API
+      displayName: Pod Placement Config
+      kind: PodPlacementConfig
+      name: podplacementconfigs.multiarch.openshift.io
+      version: v1alpha1
+  description: The Multiarch Manager Operator (MMO) operator aims to address problems
+    and usability issues encountered when working with Openshift clusters with multi-architecture
+    compute nodes.
+  displayName: multiarch-manager-operator
+  icon:
+  - base64data: ""
+    mediatype: ""
+  install:
+    spec:
+      deployments: null
+    strategy: ""
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - multiarch-manager-operator
+  - mmo
+  - pod-placement
+  links:
+  - name: Multiarch Operator
+    url: https://github.com/openshift/multiarch-manager-operator
+  maturity: alpha
+  minKubeVersion: 1.27.0
+  provider:
+    name: Red Hat
+  version: 0.0.1

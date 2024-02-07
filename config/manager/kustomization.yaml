@@ -1,10 +1,10 @@
 resources:
-  - manager.yaml
-
-#apiVersion: kustomize.config.k8s.io/v1beta1
-#kind: Kustomization
-#images:
-#- name: controller
-#  newName: quay.io/aleskandrox/asd
-#  newTag: multiarch-operator
-# Do not commit changes similar to the above one
+- manager.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+images:
+- name: controller
+  newName: controller
+  newTag: latest
+commonAnnotations:
+  multiarch.openshift.io/image: controller:latest
