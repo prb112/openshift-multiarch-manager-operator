@@ -38,32 +38,32 @@ func validateReconcile() {
 		deployment := &appsv1.Deployment{}
 		err := k8sClient.Get(ctx, crclient.ObjectKeyFromObject(&appsv1.Deployment{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      podPlacementControllerName,
+				Name:      PodPlacementControllerName,
 				Namespace: utils.Namespace(),
 			},
 		}), deployment)
-		g.Expect(err).NotTo(HaveOccurred(), "failed to get deployment "+podPlacementControllerName, err)
-	}).Should(Succeed(), "the deployment "+podPlacementControllerName+" should be created")
+		g.Expect(err).NotTo(HaveOccurred(), "failed to get deployment "+PodPlacementControllerName, err)
+	}).Should(Succeed(), "the deployment "+PodPlacementControllerName+" should be created")
 	Eventually(func(g Gomega) {
 		deployment := &appsv1.Deployment{}
 		err := k8sClient.Get(ctx, crclient.ObjectKeyFromObject(&appsv1.Deployment{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      podPlacementWebhookName,
+				Name:      PodPlacementWebhookName,
 				Namespace: utils.Namespace(),
 			},
 		}), deployment)
-		g.Expect(err).NotTo(HaveOccurred(), "failed to get deployment "+podPlacementControllerName, err)
-	}).Should(Succeed(), "the deployment "+podPlacementWebhookName+" should be created")
+		g.Expect(err).NotTo(HaveOccurred(), "failed to get deployment "+PodPlacementControllerName, err)
+	}).Should(Succeed(), "the deployment "+PodPlacementWebhookName+" should be created")
 	Eventually(func(g Gomega) {
 		service := &corev1.Service{}
 		err := k8sClient.Get(ctx, crclient.ObjectKeyFromObject(&corev1.Service{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      podPlacementWebhookName,
+				Name:      PodPlacementWebhookName,
 				Namespace: utils.Namespace(),
 			},
 		}), service)
-		g.Expect(err).NotTo(HaveOccurred(), "failed to get service "+podPlacementWebhookName, err)
-	}).Should(Succeed(), "the service "+podPlacementWebhookName+" should be created")
+		g.Expect(err).NotTo(HaveOccurred(), "failed to get service "+PodPlacementWebhookName, err)
+	}).Should(Succeed(), "the service "+PodPlacementWebhookName+" should be created")
 	Eventually(func(g Gomega) {
 		service := &corev1.Service{}
 		err := k8sClient.Get(ctx, crclient.ObjectKeyFromObject(&corev1.Service{
@@ -100,35 +100,35 @@ func validateDeletion() {
 		deployment := &appsv1.Deployment{}
 		err := k8sClient.Get(ctx, crclient.ObjectKeyFromObject(&appsv1.Deployment{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      podPlacementControllerName,
+				Name:      PodPlacementControllerName,
 				Namespace: utils.Namespace(),
 			},
 		}), deployment)
 		g.Expect(err).To(HaveOccurred())
-		g.Expect(errors.IsNotFound(err)).To(BeTrue(), "still getting the deployment "+podPlacementControllerName, err)
-	}).Should(Succeed(), "the deployment "+podPlacementControllerName+" should be deleted")
+		g.Expect(errors.IsNotFound(err)).To(BeTrue(), "still getting the deployment "+PodPlacementControllerName, err)
+	}).Should(Succeed(), "the deployment "+PodPlacementControllerName+" should be deleted")
 	Eventually(func(g Gomega) {
 		deployment := &appsv1.Deployment{}
 		err := k8sClient.Get(ctx, crclient.ObjectKeyFromObject(&appsv1.Deployment{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      podPlacementWebhookName,
+				Name:      PodPlacementWebhookName,
 				Namespace: utils.Namespace(),
 			},
 		}), deployment)
 		g.Expect(err).To(HaveOccurred())
-		g.Expect(errors.IsNotFound(err)).To(BeTrue(), "still getting the deployment "+podPlacementWebhookName, err)
-	}).Should(Succeed(), "the deployment "+podPlacementWebhookName+" should be created")
+		g.Expect(errors.IsNotFound(err)).To(BeTrue(), "still getting the deployment "+PodPlacementWebhookName, err)
+	}).Should(Succeed(), "the deployment "+PodPlacementWebhookName+" should be created")
 	Eventually(func(g Gomega) {
 		service := &corev1.Service{}
 		err := k8sClient.Get(ctx, crclient.ObjectKeyFromObject(&corev1.Service{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      podPlacementWebhookName,
+				Name:      PodPlacementWebhookName,
 				Namespace: utils.Namespace(),
 			},
 		}), service)
 		g.Expect(err).To(HaveOccurred())
-		g.Expect(errors.IsNotFound(err)).To(BeTrue(), "still getting the service "+podPlacementWebhookName, err)
-	}).Should(Succeed(), "the service "+podPlacementWebhookName+" should be created")
+		g.Expect(errors.IsNotFound(err)).To(BeTrue(), "still getting the service "+PodPlacementWebhookName, err)
+	}).Should(Succeed(), "the service "+PodPlacementWebhookName+" should be created")
 	Eventually(func(g Gomega) {
 		service := &corev1.Service{}
 		err := k8sClient.Get(ctx, crclient.ObjectKeyFromObject(&corev1.Service{
@@ -198,89 +198,89 @@ var _ = Describe("Controllers/PodPlacementConfig/PodPlacementConfigReconciler", 
 				d := appsv1.Deployment{}
 				err := k8sClient.Get(ctx, crclient.ObjectKeyFromObject(&appsv1.Deployment{
 					ObjectMeta: metav1.ObjectMeta{
-						Name:      podPlacementControllerName,
+						Name:      PodPlacementControllerName,
 						Namespace: utils.Namespace(),
 					},
 				}), &d)
-				Expect(err).NotTo(HaveOccurred(), "failed to get deployment "+podPlacementControllerName, err)
+				Expect(err).NotTo(HaveOccurred(), "failed to get deployment "+PodPlacementControllerName, err)
 				// change the deployment's replicas
 				d.Spec.Replicas = utils.NewPtr(int32(3))
 				err = k8sClient.Update(ctx, &d)
-				Expect(err).NotTo(HaveOccurred(), "failed to update deployment "+podPlacementControllerName, err)
+				Expect(err).NotTo(HaveOccurred(), "failed to update deployment "+PodPlacementControllerName, err)
 				Eventually(func(g Gomega) {
 					d := appsv1.Deployment{}
 					err = k8sClient.Get(ctx, crclient.ObjectKeyFromObject(&appsv1.Deployment{
 						ObjectMeta: metav1.ObjectMeta{
-							Name:      podPlacementControllerName,
+							Name:      PodPlacementControllerName,
 							Namespace: utils.Namespace(),
 						},
 					}), &d)
-					g.Expect(err).NotTo(HaveOccurred(), "failed to get deployment "+podPlacementControllerName, err)
+					g.Expect(err).NotTo(HaveOccurred(), "failed to get deployment "+PodPlacementControllerName, err)
 					g.Expect(d.Spec.Replicas).To(Equal(utils.NewPtr(int32(2))), "the deployment's replicas should be 2")
 				}).Should(Succeed(), "the deployment's replicas should be 2")
 			})
 			It("should reconcile the deployment pod-placement-webhook when deleted", func() {
 				err := k8sClient.Delete(ctx, &appsv1.Deployment{
 					ObjectMeta: metav1.ObjectMeta{
-						Name:      podPlacementWebhookName,
+						Name:      PodPlacementWebhookName,
 						Namespace: utils.Namespace(),
 					},
 				}, crclient.PropagationPolicy(metav1.DeletePropagationBackground))
-				Expect(err).NotTo(HaveOccurred(), "failed to delete deployment "+podPlacementWebhookName, err)
+				Expect(err).NotTo(HaveOccurred(), "failed to delete deployment "+PodPlacementWebhookName, err)
 				Eventually(func(g Gomega) {
 					d := appsv1.Deployment{}
 					err = k8sClient.Get(ctx, crclient.ObjectKeyFromObject(&appsv1.Deployment{
 						ObjectMeta: metav1.ObjectMeta{
-							Name:      podPlacementWebhookName,
+							Name:      PodPlacementWebhookName,
 							Namespace: utils.Namespace(),
 						},
 					}), &d)
-					g.Expect(err).NotTo(HaveOccurred(), "Unable to get deployment "+podPlacementWebhookName, err)
-				}).Should(Succeed(), "the deployment "+podPlacementWebhookName+" should be recreated")
+					g.Expect(err).NotTo(HaveOccurred(), "Unable to get deployment "+PodPlacementWebhookName, err)
+				}).Should(Succeed(), "the deployment "+PodPlacementWebhookName+" should be recreated")
 			})
 			It("should reconcile a service if deleted", func() {
 				err := k8sClient.Delete(ctx, &corev1.Service{
 					ObjectMeta: metav1.ObjectMeta{
-						Name:      podPlacementWebhookName,
+						Name:      PodPlacementWebhookName,
 						Namespace: utils.Namespace(),
 					},
 				}, crclient.PropagationPolicy(metav1.DeletePropagationBackground))
-				Expect(err).NotTo(HaveOccurred(), "failed to delete service "+podPlacementWebhookName, err)
+				Expect(err).NotTo(HaveOccurred(), "failed to delete service "+PodPlacementWebhookName, err)
 				Eventually(func(g Gomega) {
 					s := &corev1.Service{}
 					err = k8sClient.Get(ctx, crclient.ObjectKeyFromObject(&corev1.Service{
 						ObjectMeta: metav1.ObjectMeta{
-							Name:      podPlacementWebhookName,
+							Name:      PodPlacementWebhookName,
 							Namespace: utils.Namespace(),
 						},
 					}), s)
-					g.Expect(err).NotTo(HaveOccurred(), "failed to get service "+podPlacementWebhookName, err)
-				}).Should(Succeed(), "the service "+podPlacementWebhookName+" should be recreated")
+					g.Expect(err).NotTo(HaveOccurred(), "failed to get service "+PodPlacementWebhookName, err)
+				}).Should(Succeed(), "the service "+PodPlacementWebhookName+" should be recreated")
 			})
 			It("should reconcile a service if changed", func() {
 				s := &corev1.Service{}
 				err := k8sClient.Get(ctx, crclient.ObjectKeyFromObject(&corev1.Service{
 					ObjectMeta: metav1.ObjectMeta{
-						Name:      podPlacementWebhookName,
+						Name:      PodPlacementWebhookName,
 						Namespace: utils.Namespace(),
 					},
 				}), s)
-				Expect(err).NotTo(HaveOccurred(), "failed to get service "+podPlacementWebhookName, err)
+				Expect(err).NotTo(HaveOccurred(), "failed to get service "+PodPlacementWebhookName, err)
 				By("changing the service's port")
 				// change the service's port
 				s.Spec.Ports[0].Port = 8080
 				err = k8sClient.Update(ctx, s)
-				Expect(err).NotTo(HaveOccurred(), "failed to update service "+podPlacementWebhookName, err)
+				Expect(err).NotTo(HaveOccurred(), "failed to update service "+PodPlacementWebhookName, err)
 				By("waiting for the service's port to be reconciled")
 				Eventually(func(g Gomega) {
 					s := &corev1.Service{}
 					err = k8sClient.Get(ctx, crclient.ObjectKeyFromObject(&corev1.Service{
 						ObjectMeta: metav1.ObjectMeta{
-							Name:      podPlacementWebhookName,
+							Name:      PodPlacementWebhookName,
 							Namespace: utils.Namespace(),
 						},
 					}), s)
-					g.Expect(err).NotTo(HaveOccurred(), "failed to get service "+podPlacementWebhookName, err)
+					g.Expect(err).NotTo(HaveOccurred(), "failed to get service "+PodPlacementWebhookName, err)
 					g.Expect(s.Spec.Ports[0].Port).To(Equal(int32(443)), "the service's port should be 443")
 				}).Should(Succeed(), "the service's port never reconciled to 443")
 			})
@@ -325,26 +325,26 @@ var _ = Describe("Controllers/PodPlacementConfig/PodPlacementConfigReconciler", 
 					d := appsv1.Deployment{}
 					err = k8sClient.Get(ctx, crclient.ObjectKeyFromObject(&appsv1.Deployment{
 						ObjectMeta: metav1.ObjectMeta{
-							Name:      podPlacementControllerName,
+							Name:      PodPlacementControllerName,
 							Namespace: utils.Namespace(),
 						},
 					}), &d)
-					g.Expect(err).NotTo(HaveOccurred(), "failed to get deployment "+podPlacementControllerName, err)
+					g.Expect(err).NotTo(HaveOccurred(), "failed to get deployment "+PodPlacementControllerName, err)
 					g.Expect(d.Spec.Template.Spec.Containers[0].Args).To(ContainElement(
 						fmt.Sprintf("-zap-log-level=%d", v1alpha1.LogVerbosityLevelTraceAll.ToZapLevelInt())))
-				}).Should(Succeed(), "the deployment "+podPlacementControllerName+" should be updated")
+				}).Should(Succeed(), "the deployment "+PodPlacementControllerName+" should be updated")
 				Eventually(func(g Gomega) {
 					d := appsv1.Deployment{}
 					err = k8sClient.Get(ctx, crclient.ObjectKeyFromObject(&appsv1.Deployment{
 						ObjectMeta: metav1.ObjectMeta{
-							Name:      podPlacementWebhookName,
+							Name:      PodPlacementWebhookName,
 							Namespace: utils.Namespace(),
 						},
 					}), &d)
-					g.Expect(err).NotTo(HaveOccurred(), "failed to get deployment "+podPlacementWebhookName, err)
+					g.Expect(err).NotTo(HaveOccurred(), "failed to get deployment "+PodPlacementWebhookName, err)
 					g.Expect(d.Spec.Template.Spec.Containers[0].Args).To(ContainElement(
 						fmt.Sprintf("-zap-log-level=%d", v1alpha1.LogVerbosityLevelTraceAll.ToZapLevelInt())))
-				}).Should(Succeed(), "the deployment "+podPlacementWebhookName+" should be updated")
+				}).Should(Succeed(), "the deployment "+PodPlacementWebhookName+" should be updated")
 			})
 			It("Should sync the namespace selector", func() {
 				// get the podplacementconfig
@@ -373,7 +373,7 @@ var _ = Describe("Controllers/PodPlacementConfig/PodPlacementConfigReconciler", 
 					}), mw)
 					g.Expect(err).NotTo(HaveOccurred(), "failed to get mutating webhook configuration "+podMutatingWebhookConfigurationName, err)
 					g.Expect(mw.Webhooks[0].NamespaceSelector).To(Equal(ppc.Spec.NamespaceSelector))
-				}).Should(Succeed(), "the deployment "+podPlacementControllerName+" should be updated")
+				}).Should(Succeed(), "the deployment "+PodPlacementControllerName+" should be updated")
 			})
 		})
 	})

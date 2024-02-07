@@ -50,9 +50,9 @@ const (
 	podMutatingWebhookName              = "pod-placement-scheduling-gate.multiarch.openshift.io"
 	podMutatingWebhookConfigurationName = "pod-placement-mutating-webhook-configuration"
 
-	podPlacementControllerName               = "pod-placement-controller"
+	PodPlacementControllerName               = "pod-placement-controller"
 	podPlacementControllerMetricsServiceName = "pod-placement-controller-metrics-service"
-	podPlacementWebhookName                  = "pod-placement-web-hook"
+	PodPlacementWebhookName                  = "pod-placement-web-hook"
 	podPlacementWebhookMetricsServiceName    = "pod-placement-web-hook-metrics-service"
 	operandName                              = "pod-placement-controller"
 )
@@ -119,15 +119,15 @@ func (r *PodPlacementConfigReconciler) handleDelete(ctx context.Context) error {
 	objsToDelete := []utils.ToDeleteRef{
 		{
 			NamespacedTypedClient: r.ClientSet.AppsV1().Deployments(utils.Namespace()),
-			ObjName:               podPlacementControllerName,
+			ObjName:               PodPlacementControllerName,
 		},
 		{
 			NamespacedTypedClient: r.ClientSet.AppsV1().Deployments(utils.Namespace()),
-			ObjName:               podPlacementWebhookName,
+			ObjName:               PodPlacementWebhookName,
 		},
 		{
 			NamespacedTypedClient: r.ClientSet.CoreV1().Services(utils.Namespace()),
-			ObjName:               podPlacementWebhookName,
+			ObjName:               PodPlacementWebhookName,
 		},
 		{
 			NamespacedTypedClient: r.ClientSet.CoreV1().Services(utils.Namespace()),
@@ -149,24 +149,24 @@ func (r *PodPlacementConfigReconciler) handleDelete(ctx context.Context) error {
 func (r *PodPlacementConfigReconciler) reconcile(ctx context.Context, podPlacementConfig *multiarchv1alpha1.PodPlacementConfig) error {
 	log := ctrllog.FromContext(ctx)
 	objects := []client.Object{
-		buildDeployment(podPlacementConfig, podPlacementControllerName, 2,
+		buildDeployment(podPlacementConfig, PodPlacementControllerName, 2,
 			"multiarch-operator-podplacement-controller",
 			"--leader-elect",
 			"--enable-ppc-controllers",
 		),
-		buildDeployment(podPlacementConfig, podPlacementWebhookName, 3,
+		buildDeployment(podPlacementConfig, PodPlacementWebhookName, 3,
 			"multiarch-operator-podplacement-webhook",
 			"--enable-ppc-webhook",
 		),
-		buildService(podPlacementControllerName, podPlacementControllerName,
+		buildService(PodPlacementControllerName, PodPlacementControllerName,
 			443, intstr.FromInt32(9443)),
-		buildService(podPlacementWebhookName, podPlacementWebhookName,
+		buildService(PodPlacementWebhookName, PodPlacementWebhookName,
 			443, intstr.FromInt32(9443)),
 		buildService(
-			podPlacementControllerMetricsServiceName, podPlacementControllerName,
+			podPlacementControllerMetricsServiceName, PodPlacementControllerName,
 			8443, intstr.FromInt32(8443)),
 		buildService(
-			podPlacementWebhookMetricsServiceName, podPlacementWebhookName,
+			podPlacementWebhookMetricsServiceName, PodPlacementWebhookName,
 			8443, intstr.FromInt32(8443)),
 		buildMutatingWebhookConfiguration(podPlacementConfig),
 	}

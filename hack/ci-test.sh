@@ -44,6 +44,10 @@ if [ "$SKIP_COVERAGE" != "true" ] && [ -n "$ARTIFACT_DIR" ] && [ -d "$ARTIFACT_D
   GINKGO_ARGS="${GINKGO_ARGS} --cover --coverprofile=test-unit-coverage.out"
 fi
 
+if [ "${TEST_LABEL}" == "e2e" ]; then
+  export NAMESPACE="openshift-multiarch-operator"
+fi
+
 # Print the command we are going to run as Make would.
 echo "${GINKGO} ${GINKGO_ARGS} ${GINKGO_EXTRA_ARGS} ./..."
 # shellcheck disable=SC2086
