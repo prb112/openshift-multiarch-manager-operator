@@ -45,9 +45,12 @@ spec:
       kind: PodPlacementConfig
       name: podplacementconfigs.multiarch.openshift.io
       version: v1alpha1
-  description: The Multiarch Manager Operator (MMO) operator aims to address problems
-    and usability issues encountered when working with Openshift clusters with multi-architecture
-    compute nodes.
+  description: The Multiarch Manager Operator (MMO) enhances the user experience for
+    administrators of Openshift clusters  with multi-architecture compute nodes or
+    Site Reliability Engineers willing to migrate from single-arch to multi-arch OpenShift.
+    When diverse CPU architectures coexist within a cluster, the MMO operator stands
+    out as a pivotal tool to enhance efficiency and streamline operations such as
+    architecture-aware scheduling of workloads.
   displayName: multiarch-manager-operator
   icon:
   - base64data: ""
