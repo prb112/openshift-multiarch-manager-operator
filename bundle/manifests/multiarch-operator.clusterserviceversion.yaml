@@ -15,14 +15,14 @@ metadata:
               "app.kubernetes.io/name": "podplacementconfig",
               "app.kubernetes.io/part-of": "multiarch-operator"
             },
-            "name": "podplacementconfig-sample"
+            "name": "cluster"
           },
           "spec": {
             "logVerbosity": "Normal",
             "namespaceSelector": {
               "matchExpressions": [
                 {
-                  "key": "multiarch.openshift.io/excludeNamespace",
+                  "key": "multiarch.openshift.io/exclude-pod-placement",
                   "operator": "DoesNotExist"
                 }
               ]
@@ -31,7 +31,7 @@ metadata:
         }
       ]
     capabilities: Basic Install
-    createdAt: "2024-02-07T21:39:42Z"
+    createdAt: "2024-02-09T19:23:54Z"
     operators.operatorframework.io/builder: operator-sdk-v1.33.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
   name: multiarch-operator.v0.0.1
