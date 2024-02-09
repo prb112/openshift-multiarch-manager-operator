@@ -1,8 +1,0 @@
-apiVersion: builtin
-kind: NamespaceTransformer
-metadata:
-  name: notImportantHere
-  # The namespace must be the same as the one where the operator is deployed, as in ../default/kustomization.yaml
-  namespace: openshift-multiarch-operator
-unsetOnly: true
-setRoleBindingSubjects: allServiceAccounts

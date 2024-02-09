@@ -6,3 +6,5 @@ resources:
   - podplacement_webhook_service_account.yaml
   - podplacement_webhook_role.yaml
   - podplacement_leader_election_role_binding.yaml
+  - openshift_image_registry_cluster_role_binding.yaml
+  - openshift_image_registry_cluster_role.yaml
