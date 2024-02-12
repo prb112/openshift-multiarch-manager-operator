@@ -4,8 +4,8 @@ metadata:
   annotations:
     alm-examples: '[]'
     capabilities: Basic Install
-  name: multiarch-operator.v0.0.1
-  namespace: openshift-multiarch-operator
+  name: multiarch-manager-operator.v0.0.1
+  namespace: openshift-multiarch-manager-operator
 spec:
   apiservicedefinitions: {}
   customresourcedefinitions:

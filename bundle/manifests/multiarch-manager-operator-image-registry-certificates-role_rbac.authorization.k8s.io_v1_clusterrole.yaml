@@ -4,12 +4,12 @@ metadata:
   creationTimestamp: null
   labels:
     app.kubernetes.io/component: rbac
-    app.kubernetes.io/created-by: multiarch-operator
+    app.kubernetes.io/created-by: multiarch-manager-operator
     app.kubernetes.io/instance: image-registry-certificates-role
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: role
-    app.kubernetes.io/part-of: multiarch-operator
-  name: multiarch-operator-image-registry-certificates-role
+    app.kubernetes.io/part-of: multiarch-manager-operator
+  name: multiarch-manager-operator-image-registry-certificates-role
 rules:
 - apiGroups:
   - ""

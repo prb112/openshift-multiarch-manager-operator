@@ -1,31 +1,21 @@
----
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
+  name: read-configmaps-role
+  namespace: system
   labels:
-    app.kubernetes.io/name: clusterrole
-    app.kubernetes.io/instance: podplacement-webhook-role
+    app.kubernetes.io/name: role
+    app.kubernetes.io/instance: read-configmaps-role
     app.kubernetes.io/component: rbac
     app.kubernetes.io/created-by: multiarch-manager-operator
     app.kubernetes.io/part-of: multiarch-manager-operator
     app.kubernetes.io/managed-by: kustomize
-  name: podplacement-webhook-role
 rules:
   - apiGroups:
       - ""
     resources:
-      - pods
+      - configmaps
     verbs:
       - get
       - list
-      - patch
-      - update
       - watch
-  - apiGroups:
-      - ""
-    resources:
-      - pods/status
-    verbs:
-      - get
-      - patch
-      - update

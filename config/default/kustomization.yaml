@@ -1,13 +1,13 @@
 # Adds namespace to all resources.
 # This must match the namespace defined in ../static-namespace/namespace.transformer.yaml
-namespace: openshift-multiarch-operator
+namespace: openshift-multiarch-manager-operator
 
 # Value of this field is prepended to the
 # names of all resources, e.g. a deployment named
 # "wordpress" becomes "alices-wordpress".
 # Note that it should also match with the prefix (text before '-') of the namespace
 # field above.
-namePrefix: multiarch-operator-
+namePrefix: multiarch-manager-operator-
 
 # Labels to add to all resources and selectors.
 #commonLabels:

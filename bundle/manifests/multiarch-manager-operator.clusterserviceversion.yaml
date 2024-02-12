@@ -9,11 +9,11 @@ metadata:
           "kind": "PodPlacementConfig",
           "metadata": {
             "labels": {
-              "app.kubernetes.io/created-by": "multiarch-operator",
+              "app.kubernetes.io/created-by": "multiarch-manager-operator",
               "app.kubernetes.io/instance": "podplacementconfig-sample",
               "app.kubernetes.io/managed-by": "kustomize",
               "app.kubernetes.io/name": "podplacementconfig",
-              "app.kubernetes.io/part-of": "multiarch-operator"
+              "app.kubernetes.io/part-of": "multiarch-manager-operator"
             },
             "name": "cluster"
           },
@@ -31,11 +31,11 @@ metadata:
         }
       ]
     capabilities: Basic Install
-    createdAt: "2024-02-09T19:23:54Z"
+    createdAt: "2024-02-12T04:32:20Z"
     operators.operatorframework.io/builder: operator-sdk-v1.33.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
-  name: multiarch-operator.v0.0.1
-  namespace: openshift-multiarch-operator
+  name: multiarch-manager-operator.v0.0.1
+  namespace: openshift-multiarch-manager-operator
 spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
@@ -157,17 +157,17 @@ spec:
           - subjectaccessreviews
           verbs:
           - create
-        serviceAccountName: multiarch-operator-controller-manager
+        serviceAccountName: multiarch-manager-operator-controller-manager
       deployments:
       - label:
           app.kubernetes.io/component: manager
-          app.kubernetes.io/created-by: multiarch-operator
+          app.kubernetes.io/created-by: multiarch-manager-operator
           app.kubernetes.io/instance: controller-manager
           app.kubernetes.io/managed-by: kustomize
           app.kubernetes.io/name: deployment
-          app.kubernetes.io/part-of: multiarch-operator
+          app.kubernetes.io/part-of: multiarch-manager-operator
           control-plane: controller-manager
-        name: multiarch-operator-controller-manager
+        name: multiarch-manager-operator-controller-manager
         spec:
           replicas: 2
           selector:
@@ -275,7 +275,7 @@ spec:
                     - ALL
               securityContext:
                 runAsNonRoot: true
-              serviceAccountName: multiarch-operator-controller-manager
+              serviceAccountName: multiarch-manager-operator-controller-manager
               terminationGracePeriodSeconds: 10
               volumes:
               - name: webhook-server-cert
@@ -329,7 +329,7 @@ spec:
           verbs:
           - create
           - patch
-        serviceAccountName: multiarch-operator-controller-manager
+        serviceAccountName: multiarch-manager-operator-controller-manager
     strategy: deployment
   installModes:
   - supported: false

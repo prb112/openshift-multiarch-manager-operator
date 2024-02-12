@@ -4,17 +4,17 @@ metadata:
   creationTimestamp: null
   labels:
     app.kubernetes.io/component: rbac
-    app.kubernetes.io/created-by: multiarch-operator
+    app.kubernetes.io/created-by: multiarch-manager-operator
     app.kubernetes.io/instance: image-registry-certificates-rolebinding
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: rolebinding
-    app.kubernetes.io/part-of: multiarch-operator
-  name: multiarch-operator-image-registry-certificates-rolebinding
+    app.kubernetes.io/part-of: multiarch-manager-operator
+  name: multiarch-manager-operator-image-registry-certificates-rolebinding
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: multiarch-operator-image-registry-certificates-role
+  name: multiarch-manager-operator-image-registry-certificates-role
 subjects:
 - kind: ServiceAccount
-  name: multiarch-operator-podplacement-controller
-  namespace: openshift-multiarch-operator
+  name: multiarch-manager-operator-podplacement-controller
+  namespace: openshift-multiarch-manager-operator

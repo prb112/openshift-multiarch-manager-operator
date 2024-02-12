@@ -45,7 +45,7 @@ if [ "$SKIP_COVERAGE" != "true" ] && [ -n "$ARTIFACT_DIR" ] && [ -d "$ARTIFACT_D
 fi
 
 if [ "${TEST_LABEL}" == "e2e" ]; then
-  export NAMESPACE="openshift-multiarch-operator"
+  export NAMESPACE="openshift-multiarch-manager-operator"
 fi
 
 # Print the command we are going to run as Make would.

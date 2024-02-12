@@ -9,8 +9,8 @@ multigroup: true
 plugins:
   manifests.sdk.operatorframework.io/v2: {}
   scorecard.sdk.operatorframework.io/v2: {}
-projectName: multiarch-operator
-repo: multiarch-operator
+projectName: multiarch-manager-operator
+repo: multiarch-manager-operator
 resources:
 - controller: true
   group: core
@@ -24,6 +24,6 @@ resources:
   domain: openshift.io
   group: multiarch
   kind: PodPlacementConfig
-  path: multiarch-operator/apis/multiarch/v1alpha1
+  path: multiarch-manager-operator/apis/multiarch/v1alpha1
   version: v1alpha1
 version: "3"

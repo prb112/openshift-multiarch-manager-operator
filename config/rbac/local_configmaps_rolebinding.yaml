@@ -1,19 +1,20 @@
----
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
   labels:
     app.kubernetes.io/name: rolebinding
-    app.kubernetes.io/instance: podplacement-controller-rolebinding
+    app.kubernetes.io/instance: read-configmaps-rolebinding
     app.kubernetes.io/component: rbac
     app.kubernetes.io/created-by: multiarch-manager-operator
     app.kubernetes.io/part-of: multiarch-manager-operator
     app.kubernetes.io/managed-by: kustomize
-  name: podplacement-controller-rolebinding
+  name: read-configmaps-rolebinding
+  namespace: system
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: podplacement-controller-role
+  kind: Role
+  name: image-registry-certificates-role
 subjects:
   - kind: ServiceAccount
-    name: podplacement-controller
+    name: controller-manager
+    namespace: system
