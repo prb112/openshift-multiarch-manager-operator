@@ -26,12 +26,12 @@ var _ = Describe("The Multiarch Manager Operator", func() {
 				d, err := clientset.AppsV1().Deployments(utils.Namespace()).Get(ctx, operator.PodPlacementControllerName,
 					metav1.GetOptions{})
 				g.Expect(err).NotTo(HaveOccurred())
-				g.Expect(d.Status.AvailableReplicas).To(Equal(d.Status.Replicas),
+				g.Expect(d.Status.ReadyReplicas).To(Equal(*d.Spec.Replicas),
 					"at least one pod placement controller replicas is not available yet")
 				d, err = clientset.AppsV1().Deployments(utils.Namespace()).Get(ctx, operator.PodPlacementWebhookName,
 					metav1.GetOptions{})
 				g.Expect(err).NotTo(HaveOccurred())
-				g.Expect(d.Status.AvailableReplicas).To(Equal(d.Status.Replicas),
+				g.Expect(d.Status.ReadyReplicas).To(Equal(*d.Spec.Replicas),
 					"at least one pod placement webhook replicas is not available yet")
 			}).Should(Succeed())
 		})
