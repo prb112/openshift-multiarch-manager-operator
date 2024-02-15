@@ -11,10 +11,10 @@ import (
 
 	imgspecv1 "github.com/opencontainers/image-spec/specs-go/v1"
 
-	"github.com/openshift/multiarch-manager-operator/pkg/testing/image/fake/registry"
 	"github.com/openshift/multiarch-manager-operator/pkg/utils"
 
-	. "github.com/openshift/multiarch-manager-operator/pkg/testing/utils"
+	. "github.com/openshift/multiarch-manager-operator/pkg/testing/framework"
+	"github.com/openshift/multiarch-manager-operator/pkg/testing/image/fake/registry"
 )
 
 var _ = Describe("Controllers/Podplacement/PodReconciler", func() {

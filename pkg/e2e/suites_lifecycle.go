@@ -16,11 +16,11 @@ import (
 	"github.com/go-logr/logr"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/openshift/multiarch-manager-operator/pkg/testing/utils"
+	"github.com/openshift/multiarch-manager-operator/pkg/testing/framework"
 )
 
 func CommonInit() {
-	err := utils.RegisterScheme(scheme.Scheme)
+	err := framework.RegisterScheme(scheme.Scheme)
 	if err != nil {
 		panic(err)
 	}
@@ -29,10 +29,10 @@ func CommonInit() {
 func CommonBeforeSuite() (client runtimeclient.Client, clientset *kubernetes.Clientset,
 	ctx context.Context, suiteLog logr.Logger) {
 	var err error
-	client, err = utils.LoadClient()
+	client, err = framework.LoadClient()
 	Expect(err).ToNot(HaveOccurred())
 
-	clientset, err = utils.LoadClientset()
+	clientset, err = framework.LoadClientset()
 	Expect(err).ToNot(HaveOccurred())
 
 	suiteLog = zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true), zap.Level(zapcore.Level(-5)))

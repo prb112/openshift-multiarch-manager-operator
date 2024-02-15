@@ -1,4 +1,4 @@
-package utils
+package framework
 
 import (
 	//#nosec G505: Blocklisted import crypto/sha1: weak cryptographic primitive
@@ -65,7 +65,7 @@ func (p *PodFactory) WithInitContainersImages(images ...string) *PodFactory {
 	return p
 }
 
-// withNodeAffinity adds a node affinity to the pod. If initialAffinity is not nil, it is used as the initial value
+// WithAffinity adds the affinity to the pod. If initialAffinity is not nil, it is used as the initial value
 // of the pod's affinity. Otherwise, the pod's affinity is initialized to an empty affinity if it is nil.
 func (p *PodFactory) WithAffinity(initialAffinity *v1.Affinity) *PodFactory {
 	if p.pod.Spec.Affinity == nil {
