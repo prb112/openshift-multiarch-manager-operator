@@ -45,33 +45,28 @@ var _ = Describe("Controllers/Podplacement/PodReconciler", func() {
 						"scheduling gate annotation not found")
 				}).Should(Succeed(), "failed to remove scheduling gate from pod")
 				Eventually(func(g Gomega) {
-					g.Expect(pod.Spec.Affinity).NotTo(BeNil(), "pod affinity is nil")
-					g.Expect(pod.Spec.Affinity.NodeAffinity).NotTo(BeNil(),
-						"pod nodeAffinity is nil")
-					g.Expect(pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution).NotTo(BeNil(),
-						"requiredDuringSchedulingIgnoredDuringExecution is nil")
-					g.Expect(pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms).
-						NotTo(BeEmpty(), "node selector terms is empty")
-					g.Expect(pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms).
-						Should(WithTransform(utils.SortMatchExpressions, ConsistOf(
-							utils.SortMatchExpressions([]corev1.NodeSelectorTerm{
-								{
-									MatchExpressions: []corev1.NodeSelectorRequirement{
-										{
-											Operator: corev1.NodeSelectorOpIn,
-											Values:   supportedArchitectures,
-											Key:      utils.ArchLabel,
+					g.Expect(pod).To(HaveEquivalentNodeAffinity(
+						&corev1.NodeAffinity{
+							RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+								NodeSelectorTerms: []corev1.NodeSelectorTerm{
+									{
+										MatchExpressions: []corev1.NodeSelectorRequirement{
+											{
+												Key:      utils.ArchLabel,
+												Operator: corev1.NodeSelectorOpIn,
+												Values:   supportedArchitectures,
+											},
 										},
 									},
 								},
-							}))), "unexpected node selector terms")
+							},
+						}), "unexpected node affinity")
 				}).Should(Succeed(), "failed to set node affinity to pod")
 			},
 				Entry("OCI Index Images", imgspecv1.MediaTypeImageIndex, utils.ArchitectureAmd64, utils.ArchitectureArm64),
 				Entry("Docker images", imgspecv1.MediaTypeImageManifest, utils.ArchitecturePpc64le),
 			)
-		},
-		)
+		})
 
 		Context("with different pull secrets", func() {
 			It("handles images with global pull secrets correctly", func() {
