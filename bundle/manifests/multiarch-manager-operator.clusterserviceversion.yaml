@@ -31,7 +31,7 @@ metadata:
         }
       ]
     capabilities: Basic Install
-    createdAt: "2024-02-12T04:32:20Z"
+    createdAt: "2024-02-15T17:56:12Z"
     operators.operatorframework.io/builder: operator-sdk-v1.33.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
   name: multiarch-manager-operator.v0.0.1
@@ -178,7 +178,7 @@ spec:
             metadata:
               annotations:
                 kubectl.kubernetes.io/default-container: manager
-                multiarch.openshift.io/image: controller:latest
+                multiarch.openshift.io/image: registry.ci.openshift.org/origin/multiarch-manager-operator:main
               labels:
                 control-plane: controller-manager
             spec:
@@ -216,7 +216,7 @@ spec:
                   valueFrom:
                     fieldRef:
                       fieldPath: metadata.annotations['multiarch.openshift.io/image']
-                image: controller:latest
+                image: registry.ci.openshift.org/origin/multiarch-manager-operator:main
                 imagePullPolicy: Always
                 livenessProbe:
                   httpGet:
