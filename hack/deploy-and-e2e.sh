@@ -5,9 +5,9 @@ if ! which kubectl >/dev/null; then
   mkdir -p /tmp/bin
   export PATH=/tmp/bin:${PATH}
   ln -s "$(which oc)" "/tmp/bin/kubectl"
-  export NO_DOCKER=1
 fi
 
+export NO_DOCKER=1
 NAMESPACE=openshift-multiarch-manager-operator
 oc create namespace ${NAMESPACE}
 oc annotate namespace ${NAMESPACE} \
