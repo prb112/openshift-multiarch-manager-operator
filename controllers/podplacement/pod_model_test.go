@@ -12,8 +12,9 @@ import (
 
 	mmoimage "github.com/openshift/multiarch-manager-operator/pkg/image"
 	"github.com/openshift/multiarch-manager-operator/pkg/testing/image/fake"
+	"github.com/openshift/multiarch-manager-operator/pkg/utils"
 
-	. "github.com/openshift/multiarch-manager-operator/pkg/testing/utils"
+	. "github.com/openshift/multiarch-manager-operator/pkg/testing/framework"
 )
 
 var ctx context.Context
@@ -215,27 +216,27 @@ func TestPod_intersectImagesArchitecture(t *testing.T) {
 		{
 			name:                       "pod with a single container and multi-arch image",
 			pod:                        NewPod().WithContainersImages(fake.MultiArchImage).Build(),
-			wantSupportedArchitectures: sets.New[string](fake.ArchitectureAmd64, fake.ArchitectureArm64),
+			wantSupportedArchitectures: sets.New[string](utils.ArchitectureAmd64, utils.ArchitectureArm64),
 		},
 		{
 			name:                       "pod with a single container and single-arch image",
 			pod:                        NewPod().WithContainersImages(fake.SingleArchArm64Image).Build(),
-			wantSupportedArchitectures: sets.New[string](fake.ArchitectureArm64),
+			wantSupportedArchitectures: sets.New[string](utils.ArchitectureArm64),
 		},
 		{
 			name:                       "pod with multiple containers and same image",
 			pod:                        NewPod().WithContainersImages(fake.MultiArchImage, fake.MultiArchImage).Build(),
-			wantSupportedArchitectures: sets.New[string](fake.ArchitectureAmd64, fake.ArchitectureArm64),
+			wantSupportedArchitectures: sets.New[string](utils.ArchitectureAmd64, utils.ArchitectureArm64),
 		},
 		{
 			name:                       "pod with multiple containers, single-arch image and multi-arch image",
 			pod:                        NewPod().WithContainersImages(fake.MultiArchImage, fake.SingleArchArm64Image).Build(),
-			wantSupportedArchitectures: sets.New[string](fake.ArchitectureArm64),
+			wantSupportedArchitectures: sets.New[string](utils.ArchitectureArm64),
 		},
 		{
 			name:                       "pod with multiple containers, two multi-arch images",
 			pod:                        NewPod().WithContainersImages(fake.MultiArchImage, fake.MultiArchImage2).Build(),
-			wantSupportedArchitectures: sets.New[string](fake.ArchitectureAmd64, fake.ArchitectureArm64),
+			wantSupportedArchitectures: sets.New[string](utils.ArchitectureAmd64, utils.ArchitectureArm64),
 		},
 		{
 			name:                       "pod with multiple containers, one non-existing image",
@@ -293,9 +294,9 @@ func TestPod_getArchitecturePredicate(t *testing.T) {
 				},
 			},
 			want: v1.NodeSelectorRequirement{
-				Key:      archLabel,
+				Key:      utils.ArchLabel,
 				Operator: v1.NodeSelectorOpIn,
-				Values:   []string{fake.ArchitectureAmd64, fake.ArchitectureArm64},
+				Values:   []string{utils.ArchitectureAmd64, utils.ArchitectureArm64},
 			},
 		},
 		{
@@ -347,9 +348,9 @@ func TestPod_setArchNodeAffinity(t *testing.T) {
 			want: NewPod().WithContainersImages(fake.MultiArchImage).WithNodeSelectorTermsMatchExpressions(
 				[]v1.NodeSelectorRequirement{
 					{
-						Key:      archLabel,
+						Key:      utils.ArchLabel,
 						Operator: v1.NodeSelectorOpIn,
-						Values:   []string{fake.ArchitectureAmd64, fake.ArchitectureArm64},
+						Values:   []string{utils.ArchitectureAmd64, utils.ArchitectureArm64},
 					},
 				},
 			).Build(),
@@ -361,9 +362,9 @@ func TestPod_setArchNodeAffinity(t *testing.T) {
 			want: NewPod().WithContainersImages(fake.SingleArchAmd64Image).WithNodeSelectorTermsMatchExpressions(
 				[]v1.NodeSelectorRequirement{
 					{
-						Key:      archLabel,
+						Key:      utils.ArchLabel,
 						Operator: v1.NodeSelectorOpIn,
-						Values:   []string{fake.ArchitectureAmd64},
+						Values:   []string{utils.ArchitectureAmd64},
 					},
 				},
 			).Build(),
@@ -375,9 +376,9 @@ func TestPod_setArchNodeAffinity(t *testing.T) {
 			want: NewPod().WithContainersImages(fake.SingleArchArm64Image).WithNodeSelectorTermsMatchExpressions(
 				[]v1.NodeSelectorRequirement{
 					{
-						Key:      archLabel,
+						Key:      utils.ArchLabel,
 						Operator: v1.NodeSelectorOpIn,
-						Values:   []string{fake.ArchitectureArm64},
+						Values:   []string{utils.ArchitectureArm64},
 					},
 				},
 			).Build(),
@@ -406,9 +407,9 @@ func TestPod_setArchNodeAffinity(t *testing.T) {
 						Values:   []string{"bar"},
 					},
 					{
-						Key:      archLabel,
+						Key:      utils.ArchLabel,
 						Operator: v1.NodeSelectorOpIn,
-						Values:   []string{fake.ArchitectureAmd64, fake.ArchitectureArm64},
+						Values:   []string{utils.ArchitectureAmd64, utils.ArchitectureArm64},
 					},
 				}, []v1.NodeSelectorRequirement{
 					{
@@ -417,9 +418,9 @@ func TestPod_setArchNodeAffinity(t *testing.T) {
 						Values:   []string{"foo"},
 					},
 					{
-						Key:      archLabel,
+						Key:      utils.ArchLabel,
 						Operator: v1.NodeSelectorOpIn,
-						Values:   []string{fake.ArchitectureAmd64, fake.ArchitectureArm64},
+						Values:   []string{utils.ArchitectureAmd64, utils.ArchitectureArm64},
 					},
 				},
 			).Build(),
@@ -434,9 +435,9 @@ func TestPod_setArchNodeAffinity(t *testing.T) {
 						Values:   []string{"bar"},
 					},
 					{
-						Key:      archLabel,
+						Key:      utils.ArchLabel,
 						Operator: v1.NodeSelectorOpIn,
-						Values:   []string{fake.ArchitectureS390x},
+						Values:   []string{utils.ArchitectureS390x},
 					},
 				}, []v1.NodeSelectorRequirement{
 					{
@@ -453,9 +454,9 @@ func TestPod_setArchNodeAffinity(t *testing.T) {
 						Values:   []string{"bar"},
 					},
 					{
-						Key:      archLabel,
+						Key:      utils.ArchLabel,
 						Operator: v1.NodeSelectorOpIn,
-						Values:   []string{fake.ArchitectureS390x},
+						Values:   []string{utils.ArchitectureS390x},
 					},
 				}, []v1.NodeSelectorRequirement{
 					{
@@ -463,9 +464,9 @@ func TestPod_setArchNodeAffinity(t *testing.T) {
 						Operator: v1.NodeSelectorOpIn,
 						Values:   []string{"foo"},
 					}, {
-						Key:      archLabel,
+						Key:      utils.ArchLabel,
 						Operator: v1.NodeSelectorOpIn,
-						Values:   []string{fake.ArchitectureAmd64, fake.ArchitectureArm64},
+						Values:   []string{utils.ArchitectureAmd64, utils.ArchitectureArm64},
 					},
 				}).Build(),
 		},
@@ -500,9 +501,9 @@ func TestPod_SetNodeAffinityArchRequirement(t *testing.T) {
 			want: NewPod().WithContainersImages(fake.MultiArchImage).WithNodeSelectorTermsMatchExpressions(
 				[]v1.NodeSelectorRequirement{
 					{
-						Key:      archLabel,
+						Key:      utils.ArchLabel,
 						Operator: v1.NodeSelectorOpIn,
-						Values:   []string{fake.ArchitectureAmd64, fake.ArchitectureArm64},
+						Values:   []string{utils.ArchitectureAmd64, utils.ArchitectureArm64},
 					},
 				},
 			).Build(),
@@ -514,18 +515,18 @@ func TestPod_SetNodeAffinityArchRequirement(t *testing.T) {
 				"foo", "bar").WithNodeSelectorTermsMatchExpressions(
 				[]v1.NodeSelectorRequirement{
 					{
-						Key:      archLabel,
+						Key:      utils.ArchLabel,
 						Operator: v1.NodeSelectorOpIn,
-						Values:   []string{fake.ArchitectureAmd64, fake.ArchitectureArm64},
+						Values:   []string{utils.ArchitectureAmd64, utils.ArchitectureArm64},
 					},
 				}).Build(),
 		},
 		{
 			name: "pod with node selector and architecture requirement",
 			pod: NewPod().WithContainersImages(fake.MultiArchImage).WithNodeSelectors("foo", "bar",
-				archLabel, fake.ArchitectureArm64).Build(),
+				utils.ArchLabel, utils.ArchitectureArm64).Build(),
 			want: NewPod().WithContainersImages(fake.MultiArchImage).WithNodeSelectors("foo", "bar",
-				archLabel, fake.ArchitectureArm64).Build(),
+				utils.ArchLabel, utils.ArchitectureArm64).Build(),
 		},
 		{
 			name: "pod with no affinity",
@@ -533,9 +534,9 @@ func TestPod_SetNodeAffinityArchRequirement(t *testing.T) {
 			want: NewPod().WithContainersImages(fake.MultiArchImage).WithNodeSelectorTermsMatchExpressions(
 				[]v1.NodeSelectorRequirement{
 					{
-						Key:      archLabel,
+						Key:      utils.ArchLabel,
 						Operator: v1.NodeSelectorOpIn,
-						Values:   []string{fake.ArchitectureAmd64, fake.ArchitectureArm64},
+						Values:   []string{utils.ArchitectureAmd64, utils.ArchitectureArm64},
 					},
 				}).Build(),
 		},
@@ -545,9 +546,9 @@ func TestPod_SetNodeAffinityArchRequirement(t *testing.T) {
 			want: NewPod().WithContainersImages(fake.MultiArchImage).WithNodeSelectorTermsMatchExpressions(
 				[]v1.NodeSelectorRequirement{
 					{
-						Key:      archLabel,
+						Key:      utils.ArchLabel,
 						Operator: v1.NodeSelectorOpIn,
-						Values:   []string{fake.ArchitectureAmd64, fake.ArchitectureArm64},
+						Values:   []string{utils.ArchitectureAmd64, utils.ArchitectureArm64},
 					},
 				}).Build(),
 		},
@@ -557,9 +558,9 @@ func TestPod_SetNodeAffinityArchRequirement(t *testing.T) {
 			want: NewPod().WithContainersImages(fake.MultiArchImage).WithNodeSelectorTermsMatchExpressions(
 				[]v1.NodeSelectorRequirement{
 					{
-						Key:      archLabel,
+						Key:      utils.ArchLabel,
 						Operator: v1.NodeSelectorOpIn,
-						Values:   []string{fake.ArchitectureAmd64, fake.ArchitectureArm64},
+						Values:   []string{utils.ArchitectureAmd64, utils.ArchitectureArm64},
 					},
 				}).Build(),
 		},
@@ -580,9 +581,9 @@ func TestPod_SetNodeAffinityArchRequirement(t *testing.T) {
 						Values:   []string{"bar"},
 					},
 					{
-						Key:      archLabel,
+						Key:      utils.ArchLabel,
 						Operator: v1.NodeSelectorOpIn,
-						Values:   []string{fake.ArchitectureAmd64, fake.ArchitectureArm64},
+						Values:   []string{utils.ArchitectureAmd64, utils.ArchitectureArm64},
 					},
 				}).Build(),
 		},
@@ -640,9 +641,9 @@ func TestPod_SetNodeAffinityArchRequirement(t *testing.T) {
 			}).WithNodeSelectorTermsMatchExpressions(
 				[]v1.NodeSelectorRequirement{
 					{
-						Key:      archLabel,
+						Key:      utils.ArchLabel,
 						Operator: v1.NodeSelectorOpIn,
-						Values:   []string{fake.ArchitectureAmd64, fake.ArchitectureArm64},
+						Values:   []string{utils.ArchitectureAmd64, utils.ArchitectureArm64},
 					},
 				}).Build(),
 		},

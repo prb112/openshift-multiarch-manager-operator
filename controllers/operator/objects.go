@@ -128,9 +128,14 @@ func buildDeployment(podPlacementConfig *v1alpha1.PodPlacementConfig,
 									{
 										MatchExpressions: []corev1.NodeSelectorRequirement{
 											{
-												Key:      "kubernetes.io/arch",
+												Key:      utils.ArchLabel,
 												Operator: corev1.NodeSelectorOpIn,
-												Values:   []string{"amd64", "s390x", "ppc64le", "arm64"},
+												Values: []string{
+													utils.ArchitectureAmd64,
+													utils.ArchitectureArm64,
+													utils.ArchitectureS390x,
+													utils.ArchitecturePpc64le,
+												},
 											},
 										},
 									},

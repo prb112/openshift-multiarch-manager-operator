@@ -14,7 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	ctrl "sigs.k8s.io/controller-runtime"
 
-	"github.com/openshift/multiarch-manager-operator/pkg/testing/image/fake"
+	"github.com/openshift/multiarch-manager-operator/pkg/utils"
 )
 
 const (
@@ -56,7 +56,7 @@ func GetMockImages() []MockImage {
 		for _, mediaType := range imageMediaTypes() {
 			if manifest.MIMETypeIsMultiImage(mediaType) {
 				mockImages = append(mockImages, MockImage{
-					Architectures: sets.New[string](fake.ArchitectureArm64, fake.ArchitectureAmd64),
+					Architectures: sets.New[string](utils.ArchitectureArm64, utils.ArchitectureAmd64),
 					MediaType:     mediaType,
 					Repository:    repo,
 					Name:          ComputeNameByMediaType(mediaType),
@@ -64,7 +64,7 @@ func GetMockImages() []MockImage {
 				})
 			} else {
 				mockImages = append(mockImages, MockImage{
-					Architectures: sets.New[string](fake.ArchitecturePpc64le),
+					Architectures: sets.New[string](utils.ArchitecturePpc64le),
 					MediaType:     mediaType,
 					Repository:    repo,
 					Name:          ComputeNameByMediaType(mediaType),

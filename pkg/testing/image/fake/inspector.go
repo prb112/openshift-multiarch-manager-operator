@@ -5,19 +5,14 @@ import (
 	"errors"
 
 	"k8s.io/apimachinery/pkg/util/sets"
+
+	"github.com/openshift/multiarch-manager-operator/pkg/utils"
 )
 
 type registryInspector struct {
 	// TBD: implement test with global pull secret merging
 	// globalPullSecret []byte
 }
-
-const (
-	ArchitectureAmd64   = "amd64"
-	ArchitectureArm64   = "arm64"
-	ArchitecturePpc64le = "ppc64le"
-	ArchitectureS390x   = "s390x"
-)
 
 const (
 	SingleArchAmd64Image = "my-registry.io/library/single-arch-amd64-image:latest"
@@ -30,11 +25,11 @@ const (
 // We use a function instead of a global variable to force immutability
 func MockImagesArchitectureMap() map[string]sets.Set[string] {
 	return map[string]sets.Set[string]{
-		SingleArchAmd64Image: sets.New[string](ArchitectureAmd64),
-		SingleArchArm64Image: sets.New[string](ArchitectureArm64),
-		MultiArchImage:       sets.New[string](ArchitectureAmd64, ArchitectureArm64),
-		MultiArchImage2: sets.New[string](ArchitectureAmd64, ArchitectureArm64,
-			ArchitecturePpc64le, ArchitectureS390x),
+		SingleArchAmd64Image: sets.New[string](utils.ArchitectureAmd64),
+		SingleArchArm64Image: sets.New[string](utils.ArchitectureArm64),
+		MultiArchImage:       sets.New[string](utils.ArchitectureAmd64, utils.ArchitectureArm64),
+		MultiArchImage2: sets.New[string](utils.ArchitectureAmd64, utils.ArchitectureArm64,
+			utils.ArchitecturePpc64le, utils.ArchitectureS390x),
 	}
 }
 

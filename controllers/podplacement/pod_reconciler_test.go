@@ -11,7 +11,6 @@ import (
 
 	imgspecv1 "github.com/opencontainers/image-spec/specs-go/v1"
 
-	"github.com/openshift/multiarch-manager-operator/pkg/testing/image/fake"
 	"github.com/openshift/multiarch-manager-operator/pkg/testing/image/fake/registry"
 	"github.com/openshift/multiarch-manager-operator/pkg/utils"
 
@@ -42,7 +41,7 @@ var _ = Describe("Controllers/Podplacement/PodReconciler", func() {
 					g.Expect(pod.Spec.SchedulingGates).NotTo(ContainElement(corev1.PodSchedulingGate{
 						Name: schedulingGateName,
 					}), "scheduling gate not removed")
-					g.Expect(pod.Labels).To(HaveKeyWithValue(schedulingGateLabel, schedulingGateLabelValueRemoved),
+					g.Expect(pod.Labels).To(HaveKeyWithValue(utils.SchedulingGateLabel, utils.SchedulingGateLabelValueRemoved),
 						"scheduling gate annotation not found")
 				}).Should(Succeed(), "failed to remove scheduling gate from pod")
 				Eventually(func(g Gomega) {
@@ -59,17 +58,17 @@ var _ = Describe("Controllers/Podplacement/PodReconciler", func() {
 								{
 									MatchExpressions: []corev1.NodeSelectorRequirement{
 										{
-											Key:      archLabel,
 											Operator: corev1.NodeSelectorOpIn,
 											Values:   supportedArchitectures,
+											Key:      utils.ArchLabel,
 										},
 									},
 								},
 							}))), "unexpected node selector terms")
 				}).Should(Succeed(), "failed to set node affinity to pod")
 			},
-				Entry("OCI Index Images", imgspecv1.MediaTypeImageIndex, fake.ArchitectureAmd64, fake.ArchitectureArm64),
-				Entry("Docker images", imgspecv1.MediaTypeImageManifest, fake.ArchitecturePpc64le),
+				Entry("OCI Index Images", imgspecv1.MediaTypeImageIndex, utils.ArchitectureAmd64, utils.ArchitectureArm64),
+				Entry("Docker images", imgspecv1.MediaTypeImageManifest, utils.ArchitecturePpc64le),
 			)
 		},
 		)

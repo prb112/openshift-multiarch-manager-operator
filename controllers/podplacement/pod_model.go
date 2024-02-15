@@ -25,16 +25,7 @@ import (
 	ctrllog "sigs.k8s.io/controller-runtime/pkg/log"
 
 	"github.com/openshift/multiarch-manager-operator/pkg/image"
-)
-
-const (
-	archLabel                       = "kubernetes.io/arch"
-	schedulingGateLabel             = "multiarch.openshift.io/scheduling-gate"
-	schedulingGateLabelValueGated   = "gated"
-	schedulingGateLabelValueRemoved = "removed"
-	nodeAffinityLabel               = "multiarch.openshift.io/node-affinity"
-	nodeAffinityLabelValueSet       = "set"
-	nodeAffinityLabelValueUnset     = "unset"
+	"github.com/openshift/multiarch-manager-operator/pkg/utils"
 )
 
 var (
@@ -91,7 +82,7 @@ func (pod *Pod) RemoveSchedulingGate() {
 	if pod.Labels == nil {
 		pod.Labels = make(map[string]string)
 	}
-	pod.Labels[schedulingGateLabel] = schedulingGateLabelValueRemoved
+	pod.Labels[utils.SchedulingGateLabel] = utils.SchedulingGateLabelValueRemoved
 }
 
 // SetNodeAffinityArchRequirement wraps the logic to set the nodeAffinity for the pod.
@@ -103,7 +94,7 @@ func (pod *Pod) SetNodeAffinityArchRequirement(pullSecretDataList [][]byte) {
 
 	if pod.Spec.NodeSelector != nil {
 		for key := range pod.Spec.NodeSelector {
-			if key == archLabel {
+			if key == utils.ArchLabel {
 				// if the pod has the nodeSelector field set for the kubernetes.io/arch label, we ignore it.
 				// in fact, the nodeSelector field is ANDed with the nodeAffinity field, and we want to give the user the main control, if they
 				// manually set a predicate for the kubernetes.io/arch label.
@@ -177,7 +168,7 @@ func (pod *Pod) setArchNodeAffinity(requirement corev1.NodeSelectorRequirement) 
 		if pod.Labels == nil {
 			pod.Labels = make(map[string]string)
 		}
-		pod.Labels[nodeAffinityLabel] = nodeAffinityLabelValueSet
+		pod.Labels[utils.NodeAffinityLabel] = utils.NodeAffinityLabelValueSet
 	}
 }
 
@@ -188,7 +179,7 @@ func (pod *Pod) getArchitecturePredicate(pullSecretDataList [][]byte) (corev1.No
 		return corev1.NodeSelectorRequirement{}, err
 	}
 	return corev1.NodeSelectorRequirement{
-		Key:      archLabel,
+		Key:      utils.ArchLabel,
 		Operator: corev1.NodeSelectorOpIn,
 		Values:   architectures,
 	}, nil
