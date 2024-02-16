@@ -1,9 +1,5 @@
-# TODO: Replace with a (public) manifest-list image when available (possibly from the OKD project)
-# Note that the following is a single-arch image, but the build process will be able to build
-# a multi-arch image by using golang-based cross-build. This needs CGO_ENABLED=0 to be set currently.
-ARG BUILD_IMAGE=registry.ci.openshift.org/openshift/release:golang-1.21
 ARG RUNTIME_IMAGE=quay.io/centos/centos:stream9-minimal
-FROM ${BUILD_IMAGE} as builder
+FROM golang:1.21 as builder
 ARG TARGETOS
 ARG TARGETARCH
 
