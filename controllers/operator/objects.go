@@ -195,6 +195,19 @@ func buildDeployment(podPlacementConfig *v1alpha1.PodPlacementConfig,
 									corev1.ResourceMemory: resource.MustParse("128Mi"),
 								},
 							},
+							SecurityContext: &corev1.SecurityContext{
+								AllowPrivilegeEscalation: utils.NewPtr(false),
+								Capabilities: &corev1.Capabilities{
+									Drop: []corev1.Capability{
+										"ALL",
+									},
+								},
+								Privileged:   utils.NewPtr(false),
+								RunAsNonRoot: utils.NewPtr(true),
+								SeccompProfile: &corev1.SeccompProfile{
+									Type: corev1.SeccompProfileTypeRuntimeDefault,
+								},
+							},
 							VolumeMounts: []corev1.VolumeMount{
 								{
 									Name:      "webhook-server-cert",

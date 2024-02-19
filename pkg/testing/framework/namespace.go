@@ -7,14 +7,18 @@ import (
 )
 
 func NewEphemeralNamespace() *corev1.Namespace {
-	name := "t-" + uuid.NewString()
-	if len(name) > 63 {
-		name = name[:63]
-	}
+	name := NormalizeNameString("t-" + uuid.NewString())
 	ns := &corev1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
 		},
 	}
 	return ns
+}
+
+func NormalizeNameString(name string) string {
+	if len(name) > 63 {
+		return name[:63]
+	}
+	return name
 }
