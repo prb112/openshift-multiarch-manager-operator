@@ -142,6 +142,8 @@ make goimports
 make fmt
 # Run unit tests
 make test
+# Run e2e tests (after the operator is deployed)
+make e2e KUBECONFIG=/path/to/cluster/kubeconfig NAMESPACE=openshift-multiarch-manager-operator
 ```
 
 All the checks run on a containerized environment by default. 
