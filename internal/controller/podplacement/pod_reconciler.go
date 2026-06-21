@@ -87,9 +87,30 @@ func (r *PodReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 	metrics.ProcessedPodsCtrl.Inc()
 	defer utils.HistogramObserve(now, metrics.TimeToProcessGatedPod)
 	r.processPod(ctx, pod)
+
+	// Log pod state before update
+	if pod.PodObject().Spec.Affinity != nil &&
+		pod.PodObject().Spec.Affinity.NodeAffinity != nil &&
+		pod.PodObject().Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution != nil {
+		log.Info("About to update pod",
+			"pod", pod.Name,
+			"namespace", pod.Namespace,
+			"nodeSelectorTerms", pod.PodObject().Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
+	}
+
 	err := r.Update(ctx, pod.PodObject())
 	if err != nil {
-		log.Error(err, "Unable to update the pod")
+		// Log pod state on update failure
+		if pod.PodObject().Spec.Affinity != nil &&
+			pod.PodObject().Spec.Affinity.NodeAffinity != nil &&
+			pod.PodObject().Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution != nil {
+			log.Error(err, "Pod update failed",
+				"pod", pod.Name,
+				"namespace", pod.Namespace,
+				"nodeSelectorTerms", pod.PodObject().Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
+		} else {
+			log.Error(err, "Unable to update the pod")
+		}
 		pod.PublishEvent(corev1.EventTypeWarning, ArchitectureAwareSchedulingGateRemovalFailure, SchedulingGateRemovalFailureMsg)
 		return ctrl.Result{}, err
 	}
@@ -131,8 +152,9 @@ func (r *PodReconciler) processPod(ctx context.Context, pod *Pod) {
 
 	// Skip preferred affinity processing if the user has already configured architecture-related preferred affinity
 	// or if the reconcile loop has already applied the PPCs/CPPC (e.g., due to a retry or re-reconciliation)
+	celApplied := false
 	if !pod.isPreferredAffinityConfiguredForArchitecture() {
-		r.applyMatchingPPCs(ctx, matchingPPCs, pod)
+		celApplied = r.applyMatchingPPCs(ctx, matchingPPCs, pod)
 
 		if cppc != nil && cppc.PluginsEnabled(common.NodeAffinityScoringPluginName) {
 			pod.SetPreferredArchNodeAffinity(cppc.Spec.Plugins.NodeAffinityScoring, multiarchv1beta1.ClusterPodPlacementConfigKind)
@@ -143,6 +165,28 @@ func (r *PodReconciler) processPod(ctx context.Context, pod *Pod) {
 		r.trackSkippedMatchingConfigs(ctx, pod, cppc, matchingPPCs)
 	}
 
+	// "celArchitecturePlacement takes precedence over image-based detection"
+	// When CEL plugin successfully applies, return immediately without executing:
+	// - image-based architecture detection
+	// - fallback architecture logic
+	// - default architecture append logic
+	// This ensures ONLY the matched rule architectures are applied as per enhancement doc:
+	// "existing architecture constraints are removed and replaced"
+	if celApplied {
+		log.V(1).Info("CEL architecture placement applied successfully. Removing scheduling gate and returning.")
+		// If no preferred node affinity was set by any config, log and publish an event
+		if pod.Labels[utils.PreferredNodeAffinityLabel] == utils.LabelValueNotSet {
+			pod.PublishEvent(corev1.EventTypeNormal, ArchitectureAwareNodeAffinitySet,
+				ArchitecturePreferredPredicateSkippedMsg)
+			log.V(2).Info("No preferred node affinity was set")
+		}
+		log.V(1).Info("Removing the scheduling gate from pod.")
+		pod.RemoveSchedulingGate()
+		return
+	}
+
+	// Image-based architecture detection (only executed when CEL plugin was NOT applied)
+	var err error
 	// Prepare the requirement for the node affinity.
 	psdl, err := r.pullSecretDataList(ctx, pod)
 	pod.handleError(err, "Unable to retrieve the image pull secret data for the pod.")
@@ -151,6 +195,7 @@ func (r *PodReconciler) processPod(ctx context.Context, pod *Pod) {
 		_, err = pod.SetNodeAffinityArchRequirement(psdl)
 		pod.handleError(err, "Unable to set the node affinity for the pod.")
 	}
+
 	if pod.maxRetries() && err != nil {
 		// the number of retries is incremented in the handleError function when the error is not nil.
 		// If we enter this branch, the retries counter has been incremented and reached the max retries.
@@ -181,7 +226,8 @@ func (r *PodReconciler) processPod(ctx context.Context, pod *Pod) {
 
 // applyMatchingPPCs applies the pre-filtered matching PodPlacementConfigs to the pod.
 // The matchingPPCs slice should already be filtered to only include PPCs whose label selector matches the pod.
-func (r *PodReconciler) applyMatchingPPCs(ctx context.Context, matchingPPCs []multiarchv1beta1.PodPlacementConfig, pod *Pod) {
+// Returns true if CEL architecture placement was applied, false otherwise.
+func (r *PodReconciler) applyMatchingPPCs(ctx context.Context, matchingPPCs []multiarchv1beta1.PodPlacementConfig, pod *Pod) bool {
 	log := ctrllog.FromContext(ctx).WithName("PodPlacementConfig")
 
 	// Sort the configurations by descending priority
@@ -189,7 +235,21 @@ func (r *PodReconciler) applyMatchingPPCs(ctx context.Context, matchingPPCs []mu
 		return matchingPPCs[i].Spec.Priority > matchingPPCs[j].Spec.Priority
 	})
 
-	// For each matching namespace-scoped configuration, apply if plugin is enabled
+	// Check for celArchitecturePlacement plugin first (highest priority)
+	// Only the first matching PPC with celArchitecturePlacement enabled is applied
+	celApplied := false
+	for _, ppc := range matchingPPCs {
+		if r.applyCELArchitecturePlacement(ctx, ppc, pod) {
+			log.V(1).Info("celArchitecturePlacement plugin applied, will skip image-based detection", "PodPlacementConfig", ppc.Name)
+			celApplied = true
+			// CEL plugin was applied, it takes precedence over image-based detection
+			// Continue to allow NodeAffinityScoring to run (coexistence per enhancement)
+			break
+		}
+	}
+
+	// For each matching namespace-scoped configuration, apply NodeAffinityScoring if plugin is enabled
+	// This allows NodeAffinityScoring to coexist with celArchitecturePlacement per enhancement doc
 	for _, ppc := range matchingPPCs {
 		log.V(1).Info("Processing PodPlacementConfig", "namespace", ppc.Namespace, "name", ppc.Name)
 
@@ -203,6 +263,8 @@ func (r *PodReconciler) applyMatchingPPCs(ctx context.Context, matchingPPCs []mu
 		configSource := fmt.Sprintf("%s-%s", multiarchv1beta1.PodPlacementConfigKind, ppc.Name)
 		pod.SetPreferredArchNodeAffinity(ppc.Spec.Plugins.NodeAffinityScoring, configSource)
 	}
+
+	return celApplied
 }
 
 // trackSkippedMatchingConfigs tracks in the annotation which PPC/CPPC configs would have been applied
